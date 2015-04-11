@@ -34,8 +34,8 @@ app.post('/api/post', function(req, res) {
         return;
     }
 
-    var lat = req.body.lat;
-    var long = req.body.long;
+    var lat = parseFloat(req.body.lat);
+    var long = parseFloat(req.body.long);
     var songName = req.body.songName;
     var artist = req.body.artist;
     songs.pushSong(lat, long, songName, artist, function(s) {
