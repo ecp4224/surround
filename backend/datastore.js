@@ -49,7 +49,7 @@ module.exports = {
 
             songCollection.find({
                 'latitude': {$gte: lowerLat, $lte: highLat},
-                'longitude': {$gte: lowerLong, $lte: highLong}
+                'longitude': {$lte: lowerLong, $gte: highLong}
             }).toArray(function(err, docs) {
                 if (err)
                     errorCallback(err);
