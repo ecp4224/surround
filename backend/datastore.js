@@ -28,6 +28,8 @@ var validateDatabase = function(completed) {
     }
     else if (!database.serverConfig.isConnected())
         connectToDatabase(completed);
+    else
+        completed();
 };
 
 
