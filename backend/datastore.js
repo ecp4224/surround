@@ -48,8 +48,8 @@ module.exports = {
             var highLong = long + radius;
 
             songCollection.find({
-                'lat': {$gte: lowerLat, $lte: highLat},
-                'long': {$gte: lowerLong, $lte: highLong}
+                'latitude': {$gte: lowerLat, $lte: highLat},
+                'longitude': {$gte: lowerLong, $lte: highLong}
             }).toArray(function(err, docs) {
                 if (err)
                     errorCallback(err);
