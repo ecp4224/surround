@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var songs = require('datastore.js');
+var songs = require('./datastore.js');
 var app = express();
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
