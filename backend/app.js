@@ -28,7 +28,7 @@ app.get('/api/fetch', function(req, res) {
 });
 
 app.post('/api/post', function(req, res) {
-    if (!req.body.lat || !req.body.long || req.body.songName || req.body.artist) {
+    if (!req.body.lat || !req.body.long || !req.body.songName || !req.body.artist) {
         res.status(500);
         res.send("Invalid request!");
         return;
