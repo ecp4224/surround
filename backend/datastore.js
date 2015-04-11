@@ -43,13 +43,13 @@ module.exports = {
     getSongs: function(lat, long, completedCallback, errorCallback) {
         validateDatabase(function() {
             var lowerLat = lat - radius;
-            var highLat = lat + radius;
+            var highLat = parseFloat(lat) + radius;
             var lowerLong = long - radius;
-            var highLong = long + radius;
+            var highLong = parseFloat(long) + radius;
 
             songCollection.find({
-                'latitude': {$gte: lowerLat, $lte: highLat},
-                'longitude': {$lte: lowerLong, $gte: highLong}
+                'latitude': {$gte: '' + lowerLat, $lte: '' + highLat},
+                'longitude': {$lte: '' + lowerLong, $gte: '' + highLong}
             }).toArray(function(err, docs) {
                 if (err)
                     errorCallback(err);
