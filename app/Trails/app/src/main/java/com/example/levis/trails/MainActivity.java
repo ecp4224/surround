@@ -166,9 +166,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
             @Override
             public void onDismiss(ViewGroup viewGroup, int[] reverseSortedPositions) {
                 for (int position : reverseSortedPositions) {
-                    Song s = (Song) dynamicListAdapter.getItem(position);
                     dynamicListAdapter.remove(position);
-                    user.addToPlaylistSong(s);
                 }
             }
         };

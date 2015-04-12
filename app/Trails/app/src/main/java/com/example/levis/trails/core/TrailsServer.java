@@ -119,9 +119,10 @@ public class TrailsServer {
     }
 
     public static void playSong(String songName,String artistName, final Context someContext){
-        String QUERY = artistName+"%20-%20"+songName;
+        String QUERY = songName+" "+artistName;
+        QUERY = QUERY.replace(" ", "%20");
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, "https://gdata.youtube.com/feeds/api/videos?%20q=" + QUERY + "&alt=json",
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, "https://gdata.youtube.com/feeds/api/videos?q=" + QUERY + "&alt=json",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
