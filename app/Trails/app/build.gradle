@@ -32,4 +32,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:7.0.0'
     compile 'com.mcxiaoke.volley:library-aar:1.0.0'
     compile 'com.google.code.gson:gson:1.7.2'
+    compile 'com.google.android.gms:play-services:7.0.0'
 }
