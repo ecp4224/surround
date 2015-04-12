@@ -1,10 +1,16 @@
 var radius = 0.00076346643;
 var MongoClient = require('mongodb').MongoClient;
+var FB = require('fb');
 
 var url = 'mongodb://localhost:27017/trails';
 var database;
 var songCollection;
 var userCollection;
+
+FB.options({
+    appId: '809303289155048',
+    appSecret: 'b7efc79b8d7da524550403182fc1aa40'
+});
 
 var connectToDatabase = function (completed) {
     MongoClient.connect(url, function (err, db) {
@@ -30,6 +36,67 @@ var validateDatabase = function(completed) {
         connectToDatabase(completed);
     else
         completed();
+};
+
+var updateUser = function(fb_username, lat, long, completedCallback, errCallback) {
+    validateDatabase(function() {
+        userCollection.update(
+            { 'fb_username': fb_username },
+            {
+                'latitude': lat,
+                'longitude': long
+            }
+        );
+    });
+};
+
+var validateAndCreateUser = function(facebookUsername, accessToken, lat, long, completedCallback, errCallback) {
+    validateDatabase(function() {
+        userCollection.find({
+            'fb_username': facebookUsername
+        }).toArray(function(err, docs) {
+            if (err) {
+                errCallback(err);
+                return;
+            }
+
+            if (docs.length > 0){
+                completedCallback(docs[0]);
+                return;
+            }
+
+            userCollection.count({}, function(err, numOfDocs) {
+                FB.api('/me', {
+                    access_token: accessToken
+                }, function(result) {
+                    if (!result || result.error) {
+                        err("Failed to create user!");
+                        return;
+                    }
+                    var meObject = JSON.parse(result);
+
+                    var user = {
+                        id: numOfDocs,
+                        name: meObject.name,
+                        fb_username: facebookUsername,
+                        fb_id: meObject.id,
+                        lastActive: Math.floor(new Date() / 1000),
+                        'latitude': lat,
+                        'longitude': long
+                    };
+
+                    songCollection.insert(user, function (err, result) {
+                        if (err) {
+                           errCallback(err);
+                            return;
+                        }
+
+                        completedCallback(user);
+                    });
+                });
+            });
+        })
+    });
 };
 
 
@@ -114,6 +181,37 @@ module.exports = {
                     });
                 }
             });
+        });
+    },
+
+    getFriends: function(lat, long, fb_username, fb_access_token, completedCallback, errCallback) {
+        validateDatabase(function() {
+            FB.api('me/friends', {
+                access_token: fb_access_token
+            }, function(result) {
+                if (!result || result.error) {
+                    errCallback("Failed to get friends!");
+                    return;
+                }
+
+                var friendArray = JSON.parse(result).data;
+
+                var lowerLat = lat - radius;
+                var highLat = parseFloat(lat) + radius;
+                var lowerLong = long - radius;
+                var highLong = parseFloat(long) + radius;
+
+                userCollection.find({
+                    'latitude': {$gte: '' + lowerLat, $lte: '' + highLat},
+                    'longitude': {$lte: '' + lowerLong, $gte: '' + highLong},
+                    'fb_id': { $in: friendArray }
+                }).toArray(function(err, docs) {
+                    if (err)
+                        errorCallback(err);
+                    else
+                        completedCallback(docs);
+                });
+            })
         });
     }
 };
