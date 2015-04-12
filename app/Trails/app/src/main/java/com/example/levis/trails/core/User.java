@@ -46,7 +46,7 @@ public class User {
             map.put(j,dbSongs.get(j));
         }
 
-        dynamicSongs = (ArrayList<Song>) map.values();
+        dynamicSongs = new ArrayList<Song>(map.values());
 
     }
 }
