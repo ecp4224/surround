@@ -54,4 +54,8 @@ public class User {
     public void addToPlaylistSong(Song s) {
         usersongs.add(s);
     }
+
+    public void removeSong(Song s) {
+        usersongs.remove(s);
+    }
 }

@@ -25,6 +25,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.example.levis.trails.MainActivity" android:label="@string/app_name" />
+        <activity android:name="com.example.levis.trails.PlaylistActivity" android:label="@string/app_name" />
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges=
                 "keyboard|keyboardHidden|screenLayout|screenSize|orientation"

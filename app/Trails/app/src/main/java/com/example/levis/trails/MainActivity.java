@@ -1,6 +1,7 @@
 package com.example.levis.trails;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -8,6 +9,7 @@ import android.location.LocationManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -38,6 +40,8 @@ import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismis
 
 import java.util.List;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
 
@@ -51,7 +55,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
     private GoogleMap map;
     private TrackAdapter dynamicListAdapter;
     private DynamicListView listView;
-    private User user = new User("user");
+    public static final User user = new User("user");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +66,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff009590));
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setTitle("");
         }
 
         SmartLocation.with(this).location()
@@ -141,7 +145,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
                     return;
 
                 posting = true;
-                TrailsServer.pushToServer(mLastLocation.getLatitude(), mLastLocation.getLongitude(), p[0], p[1], new Runnable() {
+                TrailsServer.pushToServer(mLastLocation.getLatitude(), mLastLocation.getLongitude(), p[1], p[0], new Runnable() {
                     @Override
                     public void run() {
                         posting = false;
@@ -175,24 +179,24 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
         listView.setOnItemClickListener(DYNAMIC_ITEM_CLICKED);
     }
 
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.playlistButton:
+                startActivity(new Intent(this, PlaylistActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -244,6 +248,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
                 return;
 
             user.addToPlaylistSong(s);
+            Crouton.makeText(MainActivity.this, s.getSongName() + " added to playlist!", Style.CONFIRM).show();
             listView.dismiss(position);
         }
     };

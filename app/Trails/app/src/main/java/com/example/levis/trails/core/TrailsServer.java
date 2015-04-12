@@ -15,6 +15,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ public class TrailsServer {
                     @Override
                     public void onResponse(String s) {
                         Song[] songs = GSON.fromJson(s, Song[].class);
-                        onComplete.run(Arrays.asList(songs));
+                        onComplete.run(new ArrayList<>(Arrays.asList(songs)));
                     }
                 }, new Response.ErrorListener() {
             @Override
