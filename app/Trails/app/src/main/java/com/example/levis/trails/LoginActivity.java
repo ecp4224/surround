@@ -1,10 +1,12 @@
 package com.example.levis.trails;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -49,6 +51,12 @@ public class LoginActivity extends Activity {
             Log.e("exception", e.toString());
         }
         setContentView(R.layout.activity_login);
+        LocationManager lm = (LocationManager)
+                this.getSystemService(Context.LOCATION_SERVICE);
+        if(!lm.isProviderEnabled((LocationManager.GPS_PROVIDER))){
+            Intent gpsOptionsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(gpsOptionsIntent);
+        }
 
         FacebookSdk.sdkInitialize(getApplicationContext());
 
