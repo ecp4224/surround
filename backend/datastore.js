@@ -190,7 +190,7 @@ module.exports = {
         });
     },
 
-    getFriends: function(lat, long, fb_username, fb_access_token, completedCallback, errCallback) {
+    getFriends: function(lat, long, fb_access_token, completedCallback, errCallback) {
         validateDatabase(function() {
             FB.api('me/friends', {
                 access_token: fb_access_token

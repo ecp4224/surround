@@ -49,7 +49,7 @@ app.post('/api/post', function(req, res) {
 });
 
 app.get('/api/social/friends', function(req, res) {
-    if (!req.query.lat || !req.query.long || !req.query.fb_username || !req.query.fb_access_token) {
+    if (!req.query.lat || !req.query.long || !req.query.fb_access_token) {
         res.status(500);
         res.send("Invalid request!");
         return;
@@ -57,7 +57,6 @@ app.get('/api/social/friends', function(req, res) {
 
     var lat = req.query.lat;
     var long = req.query.long;
-    var fb_username = req.query.fb_username;
     var fb_access_token = req.query.fb_access_token;
 
     songs.getFriends(lat, long, fb_username, fb_access_token, function(a) {
