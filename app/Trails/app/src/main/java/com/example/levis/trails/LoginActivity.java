@@ -38,7 +38,7 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*PackageInfo info;
+        PackageInfo info;
         try {
             info = getPackageManager().getPackageInfo("com.example.levis.trails", PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
@@ -55,7 +55,7 @@ public class LoginActivity extends Activity {
             Log.e("no such an algorithm", e.toString());
         } catch (Exception e) {
             Log.e("exception", e.toString());
-        }*/
+        }
         setContentView(R.layout.activity_login);
         LocationManager lm = (LocationManager)
                 this.getSystemService(Context.LOCATION_SERVICE);
@@ -82,8 +82,7 @@ public class LoginActivity extends Activity {
                 LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
-
-                        //TODO Switch to MainActivity
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     }
 
                     @Override
@@ -103,7 +102,7 @@ public class LoginActivity extends Activity {
         welcomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO Go to next activity
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
             }
         });
     }

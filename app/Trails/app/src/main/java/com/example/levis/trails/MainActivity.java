@@ -1,7 +1,10 @@
 package com.example.levis.trails;
 
 import android.app.Dialog;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,25 +19,53 @@ import com.facebook.FacebookSdk;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
 
-public class MainActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener {
+import io.nlopez.smartlocation.OnLocationUpdatedListener;
+import io.nlopez.smartlocation.SmartLocation;
+
+public class MainActivity extends ActionBarActivity implements OnMapReadyCallback {
     final Context context = this;
     private Button button;
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     private Thread timer;
-    private boolean timerActive=true;
+    private boolean timerActive = true;
+    private GoogleMap map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff009590));
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+
+        SmartLocation.with(this).location()
+                .start(new OnLocationUpdatedListener() {
+                    @Override
+                    public void onLocationUpdated(Location location) {
+                        double mLatitude = 0.0, mLongitude = 0.0;
+                        mLastLocation = location;
+
+                        mLatitude = mLastLocation.getLatitude();
+                        mLongitude = mLastLocation.getLongitude();
+
+                        map.clear();
+                        map.addCircle(new CircleOptions()
+                                .center(new LatLng(mLatitude, mLongitude))
+                        );
+                        map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLatitude, mLongitude)));
+                        map.animateCamera(CameraUpdateFactory.zoomTo(15));
+                    }
+                });
+
         timer = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -50,6 +81,23 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
             }
         });
         timer.start();
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        /*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            }
+        }).start();*/
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -72,23 +120,6 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        double mLatitude,mLongitude;
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-            mLatitude = mLastLocation.getLatitude();
-            mLongitude = mLastLocation.getLongitude();
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,5 +152,10 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
                 alertDialog.show();
             }
         });
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
     }
 }

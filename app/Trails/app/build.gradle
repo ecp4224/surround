@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'trails'
+            keyPassword '8858dojob'
+            storeFile file('C:/Users/pentae/.babun/cygwin/home/pentae/trails.jks')
+            storePassword '8858dojob'
+        }
+    }
     compileSdkVersion 21
     buildToolsVersion "22.0.1"
-
     defaultConfig {
         applicationId "com.example.levis.trails"
         minSdkVersion 16
@@ -33,4 +40,7 @@ dependencies {
     compile 'com.mcxiaoke.volley:library-aar:1.0.0'
     compile 'com.google.code.gson:gson:1.7.2'
     compile 'com.google.android.gms:play-services:7.0.0'
+    compile ('io.nlopez.smartlocation:library:3.0.7') {
+        transitive = false
+    }
 }
