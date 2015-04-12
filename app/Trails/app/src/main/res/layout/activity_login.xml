@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:background="#009590">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_1_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp"
+        />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/logo"
+        android:layout_marginTop="120dp">
+        <Button
+            android:id="@+id/get_started_button"
+            android:layout_width="fill_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_height="60dp"
+            android:background="#40b0ac"
+            android:layout_marginBottom="10dp"
+            android:text="Get Started"
+            android:fontFamily="Univers LT Std"
+            android:textSize="25dp"
+            android:shadowColor="#000"
+            android:textColor="#fff"/>
+
+        <Button
+            android:id="@+id/facebook_button"
+            android:layout_width="fill_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_height="50dp"
+            android:background="#40b0ac"
+            android:layout_marginBottom="10dp"
+            android:text="Connect to Facebook"
+            android:fontFamily="Univers LT Std"
+            android:textSize="20dp"
+            android:textColor="#fff"
+            android:drawableLeft="@drawable/ic_1_facebook"
+            android:paddingLeft="50dp"
+            android:drawablePadding="-40dp"/>
+    </LinearLayout>
+</RelativeLayout>
