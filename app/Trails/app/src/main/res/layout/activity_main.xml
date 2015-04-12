@@ -6,7 +6,8 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="15dp">
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -16,10 +17,11 @@
             android:textColor="#fff"
             android:textSize="28dp"
             android:layout_marginBottom="20dp"/>
-        <ListView
+        <com.nhaarman.listviewanimations.itemmanipulation.DynamicListView
             android:id="@+id/list_items"
             android:layout_width="fill_parent"
-            android:layout_height="300dp" />
+            android:layout_height="300dp"
+            />
     </LinearLayout>
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
