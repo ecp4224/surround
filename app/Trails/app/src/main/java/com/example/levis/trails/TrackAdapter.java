@@ -36,7 +36,7 @@ public class TrackAdapter extends ArrayAdapter<Song> implements Insertable<Song>
             holder = (ViewHolder)convertView.getTag();
         }
 
-        Song song = super.getItem(position);
+        Song song=super.getItem(position);
 
         holder.name.setText(song.getArtist() + " - " + song.getSongName());
         holder.number.setText("" + (position + 1));
