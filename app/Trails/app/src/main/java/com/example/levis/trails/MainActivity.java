@@ -14,7 +14,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
 
+import com.example.levis.trails.core.PRunnable;
+import com.example.levis.trails.core.Song;
+import com.example.levis.trails.core.TrailsServer;
+import com.example.levis.trails.core.User;
 import com.facebook.FacebookSdk;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -25,6 +31,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.List;
 
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
@@ -37,11 +45,18 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
     private Thread timer;
     private boolean timerActive = true;
     private GoogleMap map;
+    private TrackAdapter dynamicListAdapter;
+    private User user = new User("user");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ListView listView = (ListView)findViewById(R.id.list_items);
+        dynamicListAdapter = new TrackAdapter(this);
+        listView.setAdapter(dynamicListAdapter);
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff009590));
             getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -59,19 +74,34 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
 
                         map.clear();
                         map.addCircle(new CircleOptions()
-                                .center(new LatLng(mLatitude, mLongitude))
+                                        .center(new LatLng(mLatitude, mLongitude))
                         );
                         map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLatitude, mLongitude)));
                         map.animateCamera(CameraUpdateFactory.zoomTo(15));
                     }
                 });
 
+        TrailsServer.initQueue(this);
+
         timer = new Thread(new Runnable() {
             @Override
             public void run() {
-                while(timerActive){
-                    //To do:
-                    // Querry database
+                final boolean[] completed = {true};
+                while(timerActive) {
+                    if (completed[0] && mLastLocation != null) {
+                        completed[0] = false;
+                        TrailsServer.fetchSongs(mLastLocation.getLatitude(), mLastLocation.getLongitude(), MainActivity.this, new PRunnable<List<Song>>() {
+                            @Override
+                            public void run(List<Song> p) {
+                                user.updateDynamicSongs(p);
+
+                                dynamicListAdapter.songlist = user.getUserSongs();
+                                dynamicListAdapter.notifyDataSetChanged();
+
+                                completed[0] = true;
+                            }
+                        });
+                    }
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException e) {
@@ -98,7 +128,28 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
             }
         }).start();*/
+
+
+        TrailsServer.createListener(this, new PRunnable<String[]>() {
+            @Override
+            public void run(String[] p) {
+                if (mLastLocation == null || p[0] == null || p[1] == null)
+                    return;
+                if (posting)
+                    return;
+
+                posting = true;
+                TrailsServer.pushToServer(mLastLocation.getLatitude(), mLastLocation.getLongitude(), p[0], p[1], new Runnable() {
+                    @Override
+                    public void run() {
+                        posting = false;
+                        Toast.makeText(MainActivity.this, "Posted!", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
     }
+    private boolean posting = false;
 
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

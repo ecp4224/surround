@@ -17,6 +17,7 @@
             android:textSize="28dp"
             android:layout_marginBottom="20dp"/>
         <ListView
+            android:id="@+id/list_items"
             android:layout_width="fill_parent"
             android:layout_height="300dp" />
     </LinearLayout>

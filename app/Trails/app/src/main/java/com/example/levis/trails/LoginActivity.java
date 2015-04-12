@@ -1,8 +1,6 @@
 package com.example.levis.trails;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -20,16 +18,11 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class LoginActivity extends Activity {
@@ -56,13 +49,6 @@ public class LoginActivity extends Activity {
             Log.e("exception", e.toString());
         }
         setContentView(R.layout.activity_login);
-
-        TrailsServer.postSong(0, 0, this, new PRunnable<String[]>() {
-            @Override
-            public void run(String[] p) {
-                Toast.makeText(LoginActivity.this, p[0] + " -- " + p[1], Toast.LENGTH_LONG).show();
-            }
-        });
 
         FacebookSdk.sdkInitialize(getApplicationContext());
 

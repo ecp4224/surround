@@ -2,11 +2,9 @@ package com.example.levis.trails.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Levis on 4/12/2015.
- */
 public class User {
 
     private ArrayList<Song> usersongs;
@@ -18,6 +16,10 @@ public class User {
     public User(String username){
         name = username;
         usersongs = new ArrayList<Song>();
+    }
+
+    public List<Song> getDynamicSongs() {
+        return dynamicSongs;
     }
 
     //Parameters: Nothing
@@ -34,7 +36,7 @@ public class User {
 
     //Parameters: A database of songs
     // Return: void
-    public void updateDynamicSongs(ArrayList<Song>dbSongs){
+    public void updateDynamicSongs(List<Song> dbSongs){
         ArrayList<Song> ourlist;
 
         Map<Integer,Song> map = new HashMap<Integer,Song>();
@@ -46,7 +48,7 @@ public class User {
             map.put(j,dbSongs.get(j));
         }
 
-        dynamicSongs = (ArrayList<Song>) map.values();
+        dynamicSongs = new ArrayList<>(map.values());
 
     }
 }

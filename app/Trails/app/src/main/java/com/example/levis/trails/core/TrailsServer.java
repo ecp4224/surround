@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -15,15 +16,19 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TrailsServer {
     private static final String URL = "http://45.55.186.104:8080/";
     private static Gson GSON = new Gson();
+    private static RequestQueue queue;
+    public static void initQueue(Context context) {
+        queue = Volley.newRequestQueue(context);
+    }
     public static void fetchSongs(double longitude, double latitude, Context context, final PRunnable<List<Song>> onComplete) {
-        RequestQueue queue = Volley.newRequestQueue(context);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL + "api/fetch?lat=" + latitude + "&long-" + longitude,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL + "api/fetch?lat=" + latitude + "&long=" + longitude,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
@@ -40,9 +45,40 @@ public class TrailsServer {
         queue.add(stringRequest);
     }
 
-    public static void postSong(double longitude, double latitude, Context context, final PRunnable<String[]> data) {
-        IntentFilter filter = new IntentFilter();
+    public static void pushToServer(final double longitude, final double latitude, final String songName, final String artist, final Runnable completed) {
+        StringRequest sr = new StringRequest(Request.Method.POST, URL + "api/post", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                completed.run();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("trails", "ERROR: " + error.getMessage());
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("lat", String.valueOf(latitude));
+                params.put("long", String.valueOf(longitude));
+                params.put("songName", songName);
+                params.put("artist", artist);
+                return params;
+            }
 
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("Content-Type","application/x-www-form-urlencoded");
+                return params;
+            }
+        };
+
+        queue.add(sr);
+    }
+
+    public static void createListener(Context context, final PRunnable<String[]> data) {
         IntentFilter iF = new IntentFilter();
 
 

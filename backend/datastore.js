@@ -143,8 +143,8 @@ module.exports = {
             songCollection.find({
                 'name': name,
                 'artist': artist,
-                'lat': {$gte: lowerLat, $lte: highLat},
-                'long': {$gte: lowerLong, $lte: highLong}
+                'latitude': {$gte: '' + lowerLat, $lte: '' + highLat},
+                'longitude': {$lte: '' + lowerLong, $gte: '' + highLong}
             }).toArray(function (err, docs) {
                 if (err) {
                     errorCallback(err);
