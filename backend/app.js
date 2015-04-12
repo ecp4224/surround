@@ -59,7 +59,7 @@ app.get('/api/social/friends', function(req, res) {
     var long = req.query.long;
     var fb_access_token = req.query.fb_access_token;
 
-    songs.getFriends(lat, long, fb_username, fb_access_token, function(a) {
+    songs.getFriends(lat, long, fb_access_token, function(a) {
         res.send(JSON.stringify(
             a
         ));
