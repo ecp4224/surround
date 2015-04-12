@@ -2,13 +2,6 @@ var radius = 0.00076346643;
 var MongoClient = require('mongodb').MongoClient;
 var FB = require('fb');
 
-var trail = new DB({
-    host     : 'localhost',
-    user     : 'root',
-    password : '8858dojob',
-    database : 'trails'
-});
-
 var url = 'mongodb://localhost:27017/trails';
 var database;
 var songCollection;
@@ -146,17 +139,21 @@ module.exports = {
      */
     pushSong: function(lat, long, name, artist, completedCallback, errorCallback, fb_id) {
         validateDatabase(function() {
-
             var lowerLat = lat - radius;
-            var highLat = lat + radius;
+            var highLat = parseFloat(lat) + radius;
             var lowerLong = long - radius;
-            var highLong = long + radius;
+            var highLong = parseFloat(long) + radius;
+
+            lowerLat = Math.round(lowerLat*10000000)/10000000;
+            highLat = Math.round(highLat*10000000)/10000000;
+            lowerLong = Math.round(lowerLong*10000000)/10000000;
+            highLong = Math.round(highLong*10000000)/10000000;
 
             songCollection.find({
                 'name': name,
                 'artist': artist,
-                'latitude': {$gte: '' + lowerLat, $lte: '' + highLat},
-                'longitude': {$lte: '' + lowerLong, $gte: '' + highLong}
+                'latitude': {$lte: highLat, $gte: lowerLat},
+                'longitude': {$lte: highLong, $gte: lowerLong}
             }).toArray(function (err, docs) {
                 if (err) {
                     errorCallback(err);

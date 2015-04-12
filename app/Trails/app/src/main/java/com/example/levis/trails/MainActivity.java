@@ -95,7 +95,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
                             public void run(List<Song> p) {
                                 user.updateDynamicSongs(p);
 
-                                dynamicListAdapter.songlist = user.getUserSongs();
+                                dynamicListAdapter.songlist = user.getDynamicSongs();
                                 dynamicListAdapter.notifyDataSetChanged();
 
                                 completed[0] = true;

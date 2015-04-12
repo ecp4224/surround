@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TrackAdapter extends BaseAdapter {
-    public ArrayList<Song> songlist; //Our global dynamic song list
-    public ArrayList<Song> usersongs;
+    public List<Song> songlist; //Our global dynamic song list
     private LayoutInflater mInflater;
 
     public TrackAdapter(Context context) {
@@ -75,10 +74,6 @@ public class TrackAdapter extends BaseAdapter {
 
     public void removeSongAt(int position){
         songlist.remove(position);
-    }
-
-    public ArrayList<Song> listOfSongs(){
-        return songlist;
     }
 
     static class ViewHolder {
