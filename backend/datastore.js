@@ -10,28 +10,21 @@ var connectToDatabase = function () {
     MongoClient.connect(url, function (err, db) {
         if (err)
             throw err;
-
         console.log("Connected to mongodb!");
-
         database = db;
-
         songCollection = db.collection('songs');
         userCollection = db.collection('users');
     });
 };
 
 var validateDatabase = function() {
-    if (!database) {
+    if (!database || !database.serverConfig.isConnected()) {
         connectToDatabase();
     }
-
-    if (!database.serverConfig.isConnected())
-        connectToDatabase();
 };
 
 
 module.exports = {
-
     /*
     Return an array of song objects.
     When the function complete, invoke the completedCallback function with the array as a parameter, if an error
@@ -39,12 +32,10 @@ module.exports = {
      */
     getSongs: function(lat, long, completedCallback, errorCallback) {
         validateDatabase();
-
         var lowerLat = lat - radius;
         var highLat = lat + radius;
         var lowerLong = long - radius;
         var highLong = long + radius;
-
         songCollection.find({
             'lat': {$gte: lowerLat, $lte: highLat},
             'long': {$gte: lowerLong, $lte: highLong}
@@ -72,14 +63,13 @@ module.exports = {
         songCollection.find({
             'name': name,
             'artist': artist,
-            'lat': {$gte: lowerLat, $lte: highLat},
-            'long': {$gte: lowerLong, $lte: highLong}
+            'latitude': {$gte: lowerLat, $lte: highLat},
+            'longitude': {$gte: lowerLong, $lte: highLong}
         }).toArray(function (err, docs) {
             if (err) {
                 errorCallback(err);
                 return;
             }
-
             if (docs.length > 0) {
                 completedCallback(docs[0]);
             } else {
@@ -105,7 +95,6 @@ module.exports = {
                             errorCallback(err);
                             return;
                         }
-
                         completedCallback(song);
                     });
                 });
