@@ -38,9 +38,9 @@ var validateDatabase = function(completed) {
         completed();
 };
 
-var updateUser = function(fb_username, lat, long) {
+var updateUser = function(fb_id, lat, long) {
     userCollection.update(
-        { 'fb_username': fb_username },
+        { 'fb_id': fb_id },
         {
             'latitude': lat,
             'longitude': long,
@@ -49,10 +49,10 @@ var updateUser = function(fb_username, lat, long) {
     );
 };
 
-var validateAndCreateUser = function(facebookUsername, accessToken, lat, long, completedCallback, errCallback) {
+var validateAndCreateUser = function(facebookId, accessToken, lat, long, completedCallback, errCallback) {
     validateDatabase(function() {
         userCollection.find({
-            'fb_username': facebookUsername
+            'fb_id': facebookId
         }).toArray(function(err, docs) {
             if (err) {
                 errCallback(err);
@@ -77,7 +77,6 @@ var validateAndCreateUser = function(facebookUsername, accessToken, lat, long, c
                     var user = {
                         id: numOfDocs,
                         name: meObject.name,
-                        fb_username: facebookUsername,
                         fb_id: meObject.id,
                         lastActive: Math.floor(new Date() / 1000),
                         'latitude': lat,
@@ -106,7 +105,7 @@ module.exports = {
     When the function complete, invoke the completedCallback function with the array as a parameter, if an error
     occurred, then invoke the errorCallback with the error as a parameter
      */
-    getSongs: function(lat, long, completedCallback, errorCallback, fb_username) {
+    getSongs: function(lat, long, completedCallback, errorCallback, fb_id) {
         validateDatabase(function() {
             var lowerLat = lat - radius;
             var highLat = parseFloat(lat) + radius;
@@ -117,8 +116,8 @@ module.exports = {
                 'latitude': {$gte: '' + lowerLat, $lte: '' + highLat},
                 'longitude': {$lte: '' + lowerLong, $gte: '' + highLong}
             }).toArray(function(err, docs) {
-                if (fb_username) {
-                    updateUser(fb_username, lat, long);
+                if (fb_id) {
+                    updateUser(fb_id, lat, long);
                 }
                 if (err)
                     errorCallback(err);
@@ -133,7 +132,7 @@ module.exports = {
      When the function complete, invoke the completedCallback function with the array as a parameter, if an error
      occurred, then invoke the errorCallback with the error as a parameter
      */
-    pushSong: function(lat, long, name, artist, completedCallback, errorCallback, fb_username) {
+    pushSong: function(lat, long, name, artist, completedCallback, errorCallback, fb_id) {
         validateDatabase(function() {
 
             var lowerLat = lat - radius;
@@ -173,8 +172,8 @@ module.exports = {
                         };
 
                         songCollection.insert(song, function (err, result) {
-                            if (fb_username) {
-                                updateUser(fb_username, lat, long);
+                            if (fb_id) {
+                                updateUser(fb_id, lat, long);
                             }
 
                             if (err) {

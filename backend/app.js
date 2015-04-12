@@ -16,6 +16,7 @@ app.get('/api/fetch', function(req, res) {
 
     var lat = req.query.lat;
     var long = req.query.long;
+    var id = req.query.fb_id;
 
     songs.getSongs(lat, long, function(found) {
         res.send(JSON.stringify(
@@ -24,7 +25,7 @@ app.get('/api/fetch', function(req, res) {
     }, function(e) {
         res.status(500);
         res.send(e);
-    });
+    }, id);
 });
 
 app.post('/api/post', function(req, res) {
@@ -38,6 +39,8 @@ app.post('/api/post', function(req, res) {
     var long = parseFloat(req.body.long);
     var songName = req.body.songName;
     var artist = req.body.artist;
+    var id = req.body.fb_id;
+
     songs.pushSong(lat, long, songName, artist, function(s) {
         res.send(JSON.stringify(
             s
@@ -45,7 +48,7 @@ app.post('/api/post', function(req, res) {
     }, function(e) {
         res.status(500);
         res.send(e);
-    })
+    }, id);
 });
 
 app.get('/api/social/friends', function(req, res) {
