@@ -105,9 +105,9 @@ public class TrailsServer {
             public void onReceive(Context context, Intent intent) {
                 String artist = intent.getStringExtra("artist");
                 String track = intent.getStringExtra("track");
-
                 data.run(new String[] { artist, track });
             }
         }, iF);
     }
+      
 }
