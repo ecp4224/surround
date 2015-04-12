@@ -14,10 +14,13 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class TrailsServer {
     private static final String URL = "http://45.55.186.104:8080/";
     private static Gson GSON = new Gson();
-    public static void fetchSongs(double longitude, double latitude, Context context, final PRunnable<Song[]> onComplete) {
+    public static void fetchSongs(double longitude, double latitude, Context context, final PRunnable<List<Song>> onComplete) {
         RequestQueue queue = Volley.newRequestQueue(context);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, URL + "api/fetch?lat=" + latitude + "&long-" + longitude,
@@ -25,7 +28,7 @@ public class TrailsServer {
                     @Override
                     public void onResponse(String s) {
                         Song[] songs = GSON.fromJson(s, Song[].class);
-                        onComplete.run(songs);
+                        onComplete.run(Arrays.asList(songs));
                     }
                 }, new Response.ErrorListener() {
             @Override
