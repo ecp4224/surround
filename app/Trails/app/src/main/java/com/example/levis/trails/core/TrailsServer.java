@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -18,13 +19,19 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class TrailsServer {
     private static final String URL = "http://45.55.186.104:8080/";
+    private static final String songsite = "http://developer.echonest.com/";
     private static Gson GSON = new Gson();
     private static RequestQueue queue;
+    public static String apiKey = "TD3ZI08H9ARMYGGUZ";
+    public static String consumerKey = "3837c1b220f7bc2939aeaa96d60a190a";
+    public static String sharedSecret = "ZgEV5LUVQdyvsxc7opcG0A";
+
     public static void initQueue(Context context) {
         queue = Volley.newRequestQueue(context);
     }
@@ -106,9 +113,41 @@ public class TrailsServer {
             public void onReceive(Context context, Intent intent) {
                 String artist = intent.getStringExtra("artist");
                 String track = intent.getStringExtra("track");
-
                 data.run(new String[] { artist, track });
             }
         }, iF);
     }
+
+    public static void playSong(String songName,String artistName,Context someContext){
+        String QUERY = artistName+" - "+songName;
+
+//        songName=songName.replaceAll(" ","%20");
+//        songName+="&bucket=id:7digital-US&bucket=audio_summary&bucket=tracks";
+
+        String url = "https://www.youtube.com/embed?listType=search&list="+QUERY+"&autoplay=true";
+
+
+        Intent videoClient = new Intent(Intent.ACTION_VIEW);
+        videoClient.setData(Uri.parse(url));
+        videoClient.setClassName("com.google.android.youtube", "com.google.android.youtube.WatchActivity");
+        someContext.startActivity(videoClient);
+
+/*
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, songsite + "api/v4/song/search?api_key=" + apiKey + "&format=json&results="+
+                "=1&artist="+artistName+"&title="+songName,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.d("trails", "ERROR: " + volleyError.getMessage());
+            }
+        });
+
+        queue.add(stringRequest);
+*/    }
+
+
 }
