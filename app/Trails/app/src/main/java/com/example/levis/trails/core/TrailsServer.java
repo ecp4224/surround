@@ -118,19 +118,41 @@ public class TrailsServer {
         }, iF);
     }
 
-    public static void playSong(String songName,String artistName,Context someContext){
-        String QUERY = artistName+" - "+songName;
+    public static void playSong(String songName,String artistName, final Context someContext){
+        String QUERY = artistName+"%20-%20"+songName;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, "https://gdata.youtube.com/feeds/api/videos?%20q=" + QUERY + "&alt=json",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        YoutubeSearch result = GSON.fromJson(s, YoutubeSearch.class);
+
+                        YoutubeLink[] links = result.feed.entry[0].link;
+                        for (YoutubeLink l : links) {
+                            if (l.type.equals("text/html")) {
+                                String url = l.href;
+                                someContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                            }
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.d("trails", "ERROR: " + volleyError.getMessage());
+            }
+        });
+
+        queue.add(stringRequest);
 
 //        songName=songName.replaceAll(" ","%20");
 //        songName+="&bucket=id:7digital-US&bucket=audio_summary&bucket=tracks";
-
+/*
         String url = "https://www.youtube.com/embed?listType=search&list="+QUERY+"&autoplay=true";
 
 
         Intent videoClient = new Intent(Intent.ACTION_VIEW);
         videoClient.setData(Uri.parse(url));
-        videoClient.setClassName("com.google.android.youtube", "com.google.android.youtube.WatchActivity");
-        someContext.startActivity(videoClient);
+        someContext.startActivity(videoClient);*/
 
 /*
         StringRequest stringRequest = new StringRequest(Request.Method.GET, songsite + "api/v4/song/search?api_key=" + apiKey + "&format=json&results="+
@@ -149,5 +171,21 @@ public class TrailsServer {
         queue.add(stringRequest);
 */    }
 
+    public class YoutubeSearch {
+        public YoutubeFeed feed;
+    }
 
+    public class YoutubeFeed {
+        public YoutubeEntry[] entry;
+    }
+
+    public class YoutubeEntry {
+        public YoutubeLink[] link;
+    }
+
+    public class YoutubeLink {
+        public String rel;
+        public String type;
+        public String href;
+    }
 }

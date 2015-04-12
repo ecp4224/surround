@@ -13,9 +13,15 @@ import com.nhaarman.listviewanimations.util.Insertable;
 
 public class TrackAdapter extends ArrayAdapter<Song> implements Insertable<Song> {
     private LayoutInflater mInflater;
+    private boolean isPlaylist;
 
     public TrackAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
+    }
+
+    public TrackAdapter(Context context, boolean isPlaylist) {
+        mInflater = LayoutInflater.from(context);
+        this.isPlaylist = isPlaylist;
     }
 
     @Override
@@ -31,12 +37,16 @@ public class TrackAdapter extends ArrayAdapter<Song> implements Insertable<Song>
             holder.name = (TextView)convertView.findViewById(R.id.song_name);
             holder.number = (TextView)convertView.findViewById(R.id.song_number);
 
+            if (isPlaylist) {
+                //TODO Do something
+            }
+
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder)convertView.getTag();
         }
 
-        Song song=super.getItem(position);
+        Song song = super.getItem(position);
 
         holder.name.setText(song.getArtist() + " - " + song.getSongName());
         holder.number.setText("" + (position + 1));

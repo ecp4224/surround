@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.example.levis.trails.core.Song;
+import com.example.levis.trails.core.TrailsServer;
 import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
 import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
 
@@ -16,12 +17,13 @@ public class PlaylistActivity extends ActionBarActivity {
     private static final AdapterView.OnItemClickListener DYNAMIC_ITEM_CLICKED = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (position < 0 || position >= MainActivity.user.getDynamicSongs().size())
+            if (position < 0 || position >= MainActivity.user.getUserSongs().size())
                 return;
-            Song s = MainActivity.user.getDynamicSongs().get(position);
+            Song s = MainActivity.user.getUserSongs().get(position);
             if (s == null)
                 return;
-            //TODO Play song
+
+            TrailsServer.playSong(s.getSongName(), s.getArtist(), parent.getContext());
         }
     };
     private TrackAdapter dynamicListAdapter;
