@@ -2,13 +2,14 @@ package com.example.levis.trails.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class User {
 
     private ArrayList<Song> usersongs;
-    private ArrayList<Song> dynamicSongs;
+    private List<Song> dynamicSongs;
     private String name;
     public double longitude=0, latitude=0;
 
@@ -39,16 +40,18 @@ public class User {
     public void updateDynamicSongs(List<Song> dbSongs){
         ArrayList<Song> ourlist;
 
-        Map<Integer,Song> map = new HashMap<Integer,Song>();
-
-        for(Integer i=0;i<usersongs.size();i++){
-            map.put(i,usersongs.get(i));
-        }
-        for(Integer j=0;j<dbSongs.size();j++){
-            map.put(j,dbSongs.get(j));
+        Iterator<Song> songs = dbSongs.iterator();
+        while (songs.hasNext()) {
+            Song s = songs.next();
+            if (usersongs.contains(s))
+                songs.remove();
         }
 
-        dynamicSongs = new ArrayList<>(map.values());
+        dynamicSongs = dbSongs;
 
+    }
+
+    public void addToPlaylistSong(Song s) {
+        usersongs.add(s);
     }
 }

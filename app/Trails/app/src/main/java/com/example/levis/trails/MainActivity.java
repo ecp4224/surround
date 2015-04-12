@@ -13,6 +13,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -21,16 +23,18 @@ import com.example.levis.trails.core.PRunnable;
 import com.example.levis.trails.core.Song;
 import com.example.levis.trails.core.TrailsServer;
 import com.example.levis.trails.core.User;
-import com.facebook.FacebookSdk;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.nhaarman.listviewanimations.appearance.simple.AlphaInAnimationAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.SwipeDismissAdapter;
 
 import java.util.List;
 
@@ -46,6 +50,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
     private boolean timerActive = true;
     private GoogleMap map;
     private TrackAdapter dynamicListAdapter;
+    private DynamicListView listView;
     private User user = new User("user");
 
     @Override
@@ -53,9 +58,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView listView = (ListView)findViewById(R.id.list_items);
-        dynamicListAdapter = new TrackAdapter(this);
-        listView.setAdapter(dynamicListAdapter);
+        setupListView();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(0xff009590));
@@ -72,12 +75,12 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
                         mLatitude = mLastLocation.getLatitude();
                         mLongitude = mLastLocation.getLongitude();
 
-                        map.clear();
-                        map.addCircle(new CircleOptions()
-                                        .center(new LatLng(mLatitude, mLongitude))
-                        );
                         map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mLatitude, mLongitude)));
                         map.animateCamera(CameraUpdateFactory.zoomTo(15));
+                        map.addCircle(new CircleOptions()
+                                        .center(new LatLng(mLatitude, mLongitude))
+                                        .radius(100)
+                        );
                     }
                 });
 
@@ -95,7 +98,19 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
                             public void run(List<Song> p) {
                                 user.updateDynamicSongs(p);
 
-                                dynamicListAdapter.songlist = user.getUserSongs();
+                                Song[] temp = dynamicListAdapter.getItems().toArray(new Song[dynamicListAdapter.getItems().size()]);
+                                for (Song s : p) {
+                                    if (!dynamicListAdapter.getItems().contains(s)) {
+                                        dynamicListAdapter.add(0, s);
+                                    }
+                                }
+
+                                for (Song s : temp) {
+                                    if (!p.contains(s)) {
+                                        dynamicListAdapter.remove(s);
+                                    }
+                                }
+
                                 dynamicListAdapter.notifyDataSetChanged();
 
                                 completed[0] = true;
@@ -103,7 +118,7 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
                         });
                     }
                     try {
-                        Thread.sleep(10000);
+                        Thread.sleep(3000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -115,19 +130,6 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            }
-        }).start();*/
 
 
         TrailsServer.createListener(this, new PRunnable<String[]>() {
@@ -150,6 +152,28 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
         });
     }
     private boolean posting = false;
+
+    private void setupListView() {
+        listView = (DynamicListView)findViewById(R.id.list_items);
+        dynamicListAdapter = new TrackAdapter(this);
+
+        OnDismissCallback myOnDismissCallback = new OnDismissCallback() {
+
+            @Override
+            public void onDismiss(ViewGroup viewGroup, int[] reverseSortedPositions) {
+                for (int position : reverseSortedPositions) {
+                    Song s = (Song) dynamicListAdapter.getItem(position);
+                    dynamicListAdapter.remove(position);
+                    user.addToPlaylistSong(s);
+                }
+            }
+        };
+
+        listView.enableSwipeToDismiss(myOnDismissCallback);
+
+        listView.setAdapter(dynamicListAdapter);
+        listView.setOnItemClickListener(DYNAMIC_ITEM_CLICKED);
+    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -209,4 +233,18 @@ public class MainActivity extends ActionBarActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
     }
+
+    private final AdapterView.OnItemClickListener DYNAMIC_ITEM_CLICKED = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (position < 0 || position >= user.getDynamicSongs().size())
+                return;
+            Song s = user.getDynamicSongs().get(position);
+            if (s == null)
+                return;
+
+            user.addToPlaylistSong(s);
+            listView.dismiss(position);
+        }
+    };
 }
