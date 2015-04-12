@@ -199,7 +199,7 @@ module.exports = {
                     return;
                 }
 
-                var friendArray = JSON.parse(result).data;
+                var friendArray = result.data;
 
                 var lowerLat = lat - radius;
                 var highLat = parseFloat(lat) + radius;

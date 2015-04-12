@@ -1,14 +1,14 @@
 package com.example.levis.trails.core;
 
 public class Song {
-    private long id;
-    private String name;
-    private String artist;
-    private long user_id;
-    private double latitude;
-    private double longitude;
-    private long timePosted;
-    private String[] genre;
+    private long id=0;
+    private String name="";
+    private String artist="";
+    private long user_id=0;
+    private double latitude=0;
+    private double longitude=0;
+    private long timePosted=0;
+    private String[] genre=null;
 
     private Song() { }
 
@@ -16,7 +16,7 @@ public class Song {
         return id;
     }
 
-    public String getName() {
+    public String getSongName() {
         return name;
     }
 
