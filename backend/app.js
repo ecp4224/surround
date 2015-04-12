@@ -34,13 +34,34 @@ app.post('/api/post', function(req, res) {
         return;
     }
 
-    var lat = req.body.lat;
-    var long = req.body.long;
+    var lat = parseFloat(req.body.lat);
+    var long = parseFloat(req.body.long);
     var songName = req.body.songName;
     var artist = req.body.artist;
     songs.pushSong(lat, long, songName, artist, function(s) {
         res.send(JSON.stringify(
             s
+        ));
+    }, function(e) {
+        res.status(500);
+        res.send(e);
+    })
+});
+
+app.get('/api/social/friends', function(req, res) {
+    if (!req.query.lat || !req.query.long || !req.query.fb_access_token) {
+        res.status(500);
+        res.send("Invalid request!");
+        return;
+    }
+
+    var lat = req.query.lat;
+    var long = req.query.long;
+    var fb_access_token = req.query.fb_access_token;
+
+    songs.getFriends(lat, long, fb_access_token, function(a) {
+        res.send(JSON.stringify(
+            a
         ));
     }, function(e) {
         res.status(500);
